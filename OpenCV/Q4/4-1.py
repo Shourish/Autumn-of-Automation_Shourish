@@ -1,5 +1,25 @@
 import cv2
 import numpy as np
+from math import sqrt
+
+def lencal(a,b):
+    x=np.asarray(a)
+    y=np.asarray(b)
+    z=x-y
+    return sqrt(sum(i**2 for i in z))
+
+def anglecheck(a,b,c):
+    x=np.asarray(a)
+    y=np.asarray(b)
+    z=np.asarray(c)
+    p=x-y
+    q=z-y
+    dot=np.dot(p,q)
+    p_mag=np.linalg.norm(p)
+    q_mag=np.linalg.norm(q)
+    cos=dot/sum(p_mag**2,q_mag**2)
+    return cos
+
 
 img=cv2.imread("shapes2.png")
 
@@ -24,9 +44,25 @@ for i in range(0,len(contours)):
         epsilon = 0.01*cv2.arcLength(cnt,True)
         approx = cv2.approxPolyDP(cnt,epsilon,True)
         
-        print(len(approx))
+        points=approx.ravel()
 
-        img=cv2.drawContours(img,contours,i,(0,255,0),2)
+        
+        lst=[]
+        for q in range(0,len(points)-1):
+            if q%2==0:
+                x=points[q]
+                y=points[q+1]
+                lst.append((x,y))    
+
+            
+
+
+        print('No of vertices detected: '+str(len(approx)))
+
+        
+
+
+        img=cv2.drawContours(img,contours,i,(0,0,255),2)
 
         
         x,y,w,h = cv2.boundingRect(cnt)
@@ -37,6 +73,10 @@ for i in range(0,len(contours)):
             font = cv2.FONT_HERSHEY_SIMPLEX
             cv2.putText(img,'Triangle',(x,y+h+15), font, 0.5,(255,0,0),1,cv2.LINE_AA)
         if len(approx)==4:
+            ab=lencal(lst[0],lst[1])
+            bc=lencal(lst[1],lst[2])
+            cd=lencal(lst[2],lst[3])
+            ad=lencal(lst[3],lst[0])
 
             if w==h and w*h-cv2.contourArea(cnt)<0.1*w*h:
                 font = cv2.FONT_HERSHEY_SIMPLEX
@@ -44,7 +84,7 @@ for i in range(0,len(contours)):
             if w!=h and w*h-cv2.contourArea(cnt)<0.1*w*h:
                 font = cv2.FONT_HERSHEY_SIMPLEX
                 cv2.putText(img,'Rectangle',(x,y+h+15), font, 0.5,(255,0,0),1,cv2.LINE_AA)
-            if w*h-cv2.contourArea(cnt)>0.1*w*h:
+            if w*h-cv2.contourArea(cnt)>0.1*w*h and int(ab)==int(bc)==int(cd)==int(ad):
                 font = cv2.FONT_HERSHEY_SIMPLEX
                 cv2.putText(img,'Rhombus',(x,y+h+15), font, 0.5,(255,0,0),1,cv2.LINE_AA)      
         if len(approx)>5:
@@ -55,6 +95,7 @@ for i in range(0,len(contours)):
                 font = cv2.FONT_HERSHEY_SIMPLEX
                 cv2.putText(img,'Ellipse',(x,y+h+15), font, 0.5,(255,0,0),1,cv2.LINE_AA)
 
+#Since we can find coordinates of polygon, sidelength and angle, we can accordingly set conditions for other polygons as well
 
 
 
