@@ -37,10 +37,10 @@ def callback(var):
 	global y_in
 	global z_in
 	global w_in
-	x_in=var.x
-	y_in=var.y
-	z_in=var.z
-	w_in=var.w
+	x_in.data=var.x
+	y_in.data=var.y
+	z_in.data=var.z
+	w_in.data=var.w
 
 	
 
@@ -57,8 +57,8 @@ def publisher():
 		out.pitch=pitch
 		out.yaw=yaw
 		pub.publish(out)
-		#print(out)
-	rate.sleep()
+		print(out)
+		rate.sleep()
 
 if __name__=='__main__':
 	try:
